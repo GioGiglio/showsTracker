@@ -1,5 +1,6 @@
 import requests
 import json
+from tabulate import tabulate
 
 class TvShow:
   def __init__(self,name,id):
@@ -35,7 +36,16 @@ def searchShow(name):
   if resp.status_code != 200:
     print('error requesting:', queryUrl)
 
-  print(resp.json())
+  shows = resp.json()
+  showsUrl = 'http://www.tvmaze.com/shows/'
+  shows = [
+            [ i,
+            s['show']['name'],
+            ','.join(s['show']['genres']),
+            s['show']['rating']['average'],
+            '{}{}'.format(showsUrl, s['show']['id']) ]
+            for i,s in enumerate(shows)]
+  print(tabulate([*shows], headers=['#','Name','Genre','Rating','Link']))
 
 def getShowEpisodes(showId):
   queryUrl = '{}/shows/{}/episodes'.format(baseUrl,showId)
@@ -69,7 +79,7 @@ def getSeasonEpisodes(seasonId):
   print(resp.json())
 
 
-# searchShow('office')
+searchShow('office')
 # getShowSeasons(526)
 # getSeasonEpisodes(2087)
-getShowEpisodes(526)
+# getShowEpisodes(526)
