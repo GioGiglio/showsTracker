@@ -2,12 +2,15 @@ import requests
 import json
 from tabulate import tabulate
 
-class TvShow:
+class Show:
   def __init__(self,name,id):
     __slots__ = ['name','id','seasons']
     self.name = name
     self.id = id
     self.seasons = []
+
+  def addSeason(self,s):
+    self.seasons.append(s)
 
 class Season:
   def __init__(self,number,id):
@@ -16,15 +19,15 @@ class Season:
     self.id = id
     self.episodes = []
 
+  def addEpisode(self,e):
+    self.episodes.append(e)
+
 class Episode:
   def __init__(self,name, number, id):
     __slots__ = ['name','number','id']
     self.name = name
     self.number = number
     self.id = id
-
-  def __str__(self):
-    return 'Id: {} \tNumber: {}\tName: {}'.format(self.id, self.number, self.name)
 
 baseUrl = 'http://api.tvmaze.com'
 
@@ -37,38 +40,33 @@ def searchShow(name):
     print('error requesting:', queryUrl)
 
   shows = resp.json()
-  showsUrl = 'http://www.tvmaze.com/shows/'
-  shows = [
-            [ i,
-            s['show']['name'],
-            ','.join(s['show']['genres']),
-            s['show']['rating']['average'],
-            '{}{}'.format(showsUrl, s['show']['id']) ]
-            for i,s in enumerate(shows)]
-  print(tabulate([*shows], headers=['#','Name','Genre','Rating','Link']))
 
-def getShowEpisodes(showId):
-  queryUrl = '{}/shows/{}/episodes'.format(baseUrl,showId)
+def getShowEpisodes(show):
+  queryUrl = '{}/shows/{}/episodes'.format(baseUrl, show.id)
   resp = requests.get(queryUrl)
   if resp.status_code != 200:
     print('error requesting:', queryUrl)
 
   episodes = resp.json()
-  listOfEpisodes = []
-  for e in episodes:
-    ep = Episode(e['name'], e['number'], e['id'])
-    listOfEpisodes.append(ep)
-  
-  for e in listOfEpisodes:
-    print(e)
+  curr = 0
 
-def getShowSeasons(ShowId):
-  queryUrl = '{}/shows/{}/seasons'.format(baseUrl, ShowId)
+  for e in episodes:
+
+    if e['season'] != show.seasons[curr].number:
+      # go to next season
+      curr += 1
+    
+    show.seasons[curr].addEpisode(Episode(e['name'], e['number'], e['id']))
+  
+def getShowSeasons(show):
+  queryUrl = '{}/shows/{}/seasons'.format(baseUrl, show.id)
   resp = requests.get(queryUrl)
   if resp.status_code != 200:
     print('error requesting:', queryUrl)
 
-
+  seasons = resp.json()
+  for s in seasons:
+    show.addSeason(Season(s['number'], s['id']))
 
 def getSeasonEpisodes(seasonId):
   queryUrl = '{}/seasons/{}/episodes'.format(baseUrl, seasonId)
@@ -79,7 +77,16 @@ def getSeasonEpisodes(seasonId):
   print(resp.json())
 
 
-searchShow('office')
+theOffice = Show('The Office', 526)
+getShowSeasons(theOffice)
+getShowEpisodes(theOffice)
+
+# searchShow('office')
 # getShowSeasons(526)
 # getSeasonEpisodes(2087)
-# getShowEpisodes(526)
+
+for s in theOffice.seasons:
+  print('Season: {} id:{}'.format(s.number, s.id))
+  for e in s.episodes:
+    print('\tEpisode {}: {} id:{}'.format(e.number, e.name, e.id))
+
