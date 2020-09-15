@@ -1,6 +1,5 @@
 import requests
-import json
-from tabulate import tabulate
+import db
 
 class Show:
   def __init__(self,name,id):
@@ -81,12 +80,19 @@ theOffice = Show('The Office', 526)
 getShowSeasons(theOffice)
 getShowEpisodes(theOffice)
 
-# searchShow('office')
+rickAndMorty = Show('Rick and Morty', 216)
+getShowSeasons(rickAndMorty)
+getShowEpisodes(rickAndMorty)
+
+# searchShow('')
 # getShowSeasons(526)
 # getSeasonEpisodes(2087)
 
-for s in theOffice.seasons:
+for s in rickAndMorty.seasons:
   print('Season: {} id:{}'.format(s.number, s.id))
   for e in s.episodes:
     print('\tEpisode {}: {} id:{}'.format(e.number, e.name, e.id))
+
+db.init()
+db.saveShow(rickAndMorty)
 
