@@ -1,35 +1,8 @@
 import requests
 import db
-
-class Show:
-  def __init__(self,name,id):
-    __slots__ = ['name','id','seasons']
-    self.name = name
-    self.id = id
-    self.seasons = []
-
-  def addSeason(self,s):
-    self.seasons.append(s)
-
-class Season:
-  def __init__(self,number,id):
-    __slots__ = ['number','id','episodes']
-    self.number = number
-    self.id = id
-    self.episodes = []
-
-  def addEpisode(self,e):
-    self.episodes.append(e)
-
-class Episode:
-  def __init__(self,name, number, id):
-    __slots__ = ['name','number','id']
-    self.name = name
-    self.number = number
-    self.id = id
+from objects import *
 
 baseUrl = 'http://api.tvmaze.com'
-
 
 def searchShow(name):
   subUrl = '/search/shows'
@@ -84,15 +57,17 @@ rickAndMorty = Show('Rick and Morty', 216)
 getShowSeasons(rickAndMorty)
 getShowEpisodes(rickAndMorty)
 
+ #theOffice.printEpisodes()
+ #rickAndMorty.printEpisodes()
+
 # searchShow('')
 # getShowSeasons(526)
 # getSeasonEpisodes(2087)
+#db.getShows()
+#db.saveShow(rickAndMorty)
 
-for s in rickAndMorty.seasons:
-  print('Season: {} id:{}'.format(s.number, s.id))
-  for e in s.episodes:
-    print('\tEpisode {}: {} id:{}'.format(e.number, e.name, e.id))
 
 db.init()
-db.saveShow(rickAndMorty)
-
+shows = db.getShows()
+for s in shows:
+  s.printEpisodes()
