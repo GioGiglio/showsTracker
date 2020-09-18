@@ -7,9 +7,18 @@ conn = None
 def __connect():
   return sqlite3.connect(DB_PATH)
 
+def disconnect():
+  conn.close()
+
 def init():
   global conn
   conn = __connect()
+
+
+def checkShowExist(showId):
+  curs = conn.cursor()
+  curs.execute('SELECT * FROM show WHERE id=?',(showId,))
+  return curs.fetchone() != None
 
 def saveShow(show):
   curs = conn.cursor()

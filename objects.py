@@ -7,6 +7,9 @@ class Show:
 
   def addSeason(self,s):
     self.seasons.append(s)
+  
+  def addSeasons(self, seasons):
+    self.seasons.extend(seasons)
 
   def printEpisodes(self):
     for s in self.seasons:
