@@ -25,7 +25,7 @@ def parseArgs():
   parser = argparse.ArgumentParser(description='Shows progress tracker.')
   parser.add_argument('-add', action='store', nargs='*')
   parser.add_argument('show', action='store', nargs='*')
-  # parser.add_argument('-watch', action='store', nargs='*')
+  parser.add_argument('-watch', action='store', nargs='*')
   return parser.parse_args()
   
 
@@ -60,11 +60,12 @@ def getShow(args):
   print(args)
   show = db.getShowLike(' '.join(args))
   if not show:
-    print('-- Cannot find show')
+    print('-- ERROR: Cannot find show')
     return
   
   show = db.getShow(show.id)
-  show.printEpisodes()
+  print(show.lastWatchedEpisode())
+  #show.printEpisodes()
 
 if __name__ == '__main__':
   main()
