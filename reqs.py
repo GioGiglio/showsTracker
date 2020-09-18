@@ -27,8 +27,6 @@ def getShowSeasons(showId):
     raise Exception('Request error')
 
   return resp.json()
-  for s in seasons:
-    show.addSeason(Season(s['number'], s['id']))
 
 def getSeasonEpisodes(seasonId):
   queryUrl = '{}/seasons/{}/episodes'.format(baseUrl, seasonId)

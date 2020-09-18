@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import db
 import reqs
 import util
@@ -5,6 +7,8 @@ from objects import *
 import threading
 import argparse
 import os
+
+# Shows: Rick and Morty, Peaky blinders, The office, Futurama
 
 def main():
   os.system('clear')
@@ -21,6 +25,7 @@ def main():
   db.disconnect()
   exit()
 
+# TODO add argument to watch n episodes
 def parseArgs():
   parser = argparse.ArgumentParser(description='Shows progress tracker.')
   parser.add_argument('-add', action='store', nargs='*')
@@ -38,64 +43,30 @@ def addShow(args):
     print('-- Show already tracked')
     return
   
-  seasons = reqs.getShowSeasons(show.id)
-  seasons = [ Season(s['number'], s['id']) for s in seasons]
-  show.addSeasons(seasons)
-
   episodes = reqs.getShowEpisodes(show.id)
-  curr = 0
-  for e in episodes:
-    if e['season'] != show.seasons[curr].number:
-      # go to next season
-      curr += 1
-    
-    # add episode to current season
-    show.seasons[curr].addEpisode(Episode(e['name'], e['number'], e['id']))
-
+  episodes = [ Episode(e['id'], e['season'], e['number'], e['name']) for e in episodes]
+  show.addEpisodes(episodes)
+  
   db.saveShow(show)
   show.printEpisodes()
 
 
 def getShow(args):
-  print(args)
   show = db.getShowLike(' '.join(args))
   if not show:
-    print('-- ERROR: Cannot find show')
+    print('-- ERROR: Show is not tracked')
     return
+
+  episodes = db.getShowEpisodes(show.id)
+  show.addEpisodes(episodes)
+  show.printEpisodes()
   
-  show = db.getShow(show.id)
-  print(show.lastWatchedEpisode())
+  #print(show.lastWatchedEpisode())
   #show.printEpisodes()
 
 if __name__ == '__main__':
   main()
 
 
- #theOffice = Show('The Office', 526)
- #getShowSeasons(theOffice)
- #getShowEpisodes(theOffice)
- #
- #rickAndMorty = Show('Rick and Morty', 216)
- #getShowSeasons(rickAndMorty)
- #getShowEpisodes(rickAndMorty)
- #
-  ##theOffice.printEpisodes()
-  ##rickAndMorty.printEpisodes()
- #
- ## searchShow('')
- ## getShowSeasons(526)
- ## getSeasonEpisodes(2087)
- ##db.getShows()
- ##db.saveShow(rickAndMorty)
- #
- #ui = Ui()
- #uiThread = threading.Thread(target=ui.start())
- #
- #db.init()
- #shows = db.getShows()
- #
- #ui.printShows(shows)
- #
- ##for s in shows:
- ##  s.printEpisodes()
-
+ #theOffice = Show(526, 'The Office')
+ #rickAndMorty = Show(216, 'Rick and Morty')

@@ -1,53 +1,33 @@
 class Show:
-  def __init__(self,name,id):
-    __slots__ = ['name','id','seasons']
+  def __init__(self,id, name):
+    __slots__ = ['id','name','episodes']
+    self.id = id
     self.name = name
-    self.id = id
-    self.seasons = []
-
-  def addSeason(self,s):
-    self.seasons.append(s)
-  
-  def addSeasons(self, seasons):
-    self.seasons.extend(seasons)
-
-  def lastNextEpisode(self):
-    last = next = None
-
-    for s in self.seasons:
-      for e in s.episodes:
-        if e.watched:
-          last = e
-          last.season = s.number
-        else:
-          break
-    return last
-
-
-  def printEpisodes(self):
-    for s in self.seasons:
-      print('Season: {}'.format(s.number))
-      for e in s.episodes:
-        print('\tEpisode {}: {}'.format(e.number, e.name))
-
-class Season:
-  def __init__(self,number,id):
-    __slots__ = ['number','id','episodes']
-    self.number = number
-    self.id = id
     self.episodes = []
 
   def addEpisode(self,e):
     self.episodes.append(e)
+  
+  def addEpisodes(self, episodes):
+    self.episodes.extend(episodes)
+
+# TODO implement
+  def lastNextEpisode(self):
+    last = next = None
+    return None
+
+  def printEpisodes(self):
+    for e in self.episodes:
+      print('{} S{} E{}: {}'.format('<·>' if e.watched else '', e.season, e.number, e.name))
 
 class Episode:
-  def __init__(self,name, number, id, watched=False, season=None):
-    __slots__ = ['name','number','id','watched']
-    self.name = name
-    self.number = number
+  def __init__(self, id, season, number, name,  watched=False):
+    __slots__ = ['id','season','number','name','watched']
     self.id = id
-    self.watched = watched
     self.season = season
+    self.number = number
+    self.name = name
+    self.watched = watched
 
   def __str__(self):
     return 'S{} E{}: {}'.format(

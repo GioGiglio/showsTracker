@@ -32,5 +32,5 @@ def promptSelectShow(showsData):
 
   id = showsData[selected]['show']['id']
   name = showsData[selected]['show']['name']
-  return Show(name, id)
+  return Show(id, name)
 
