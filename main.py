@@ -15,6 +15,14 @@ def main():
   db.init()
   args = parseArgs()
   print(args)
+
+
+  shows = db.getShows()
+  for s in shows:
+    print(s.lastNextEpisode())
+
+  db.disconnect()
+  exit()
   
   if args.add:
     addShow(args.add)

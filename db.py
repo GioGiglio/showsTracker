@@ -1,6 +1,7 @@
 from objects import Show,Episode
 import sqlite3
 import time
+import itertools
 
 DB_PATH = 'showsTracker.db'
 conn = None
@@ -54,50 +55,27 @@ def getShowEpisodes(showId):
   episodes = [Episode(r[0], r[1], r[2], r[3], r[4]) for r in rows]
   return episodes
 
-# TODO change, remove seasons
 def getShows():
   curs = conn.cursor()
 
   query = '''
-  SELECT show.*, s.id, s.number, e.id, e.number, e.name, e.watched
-  FROM show JOIN season AS s ON show.id = s.show_id
-  JOIN episode AS e ON e.season_id = s.id ORDER BY show.id;
+  SELECT s.id, s.name, e.id, e.season, e.number, e.name, e.watched
+  FROM show AS s JOIN episode AS e ON s.id = e.show_id ORDER BY s.date_tracked
   '''
 
-# show.id, show.name, s.id, s.num, ep.id, ep.num, ep.name, ep.watched
-#   |          |        |     |       |      |       |        |
-#   0          1        2     3       4      5       6        7
-
   shows = []
-  showIdx = 0
-  
+  getShowIdLambda = lambda e: e[0]
+
   curs.execute(query)
-  r1 = curs.fetchone()
-
-  shows.append(Show(r1[1],r1[0]))
-  currSeason = Season(r1[3],r1[2])
-  currSeason.addEpisode(Episode(r1[6],r1[5],r1[4],r1[7]))
-
-  rows = curs.fetchall()
-  for r in rows:
-    # if show changed
-    if r[0] != shows[showIdx].id:
-      shows[showIdx].addSeason(currSeason)
-      shows.append(Show(r[1],r[0]))
-      showIdx += 1
-      
-      # update current season
-      currSeason = Season(r[3],r[2])
-    
-    # if season changed
-    if r[2] != currSeason.id:
-      shows[showIdx].addSeason(currSeason)
-      currSeason = Season(r[3],r[2])
-    
-    # add episode to current season
-    currSeason.addEpisode(Episode(r[6],r[5],r[4],r[7]))
+  data = curs.fetchall()
   
-  # currSeason add current season to last show
-  shows[showIdx].addSeason(currSeason)
+  # split data to get a list for each show
+  for k, g in itertools.groupby(data, getShowIdLambda):
+    g = list(g)
+    show = Show(g[0],g[1])
+    episodes = [Episode(e[2],e[3],e[4],e[5],e[6]) for e in g]
+    show.addEpisodes(episodes)
+    shows.append(show)
+
   return shows
 
