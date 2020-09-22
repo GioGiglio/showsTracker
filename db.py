@@ -60,7 +60,7 @@ def getShows():
 
   query = '''
   SELECT s.id, s.name, e.id, e.season, e.number, e.name, e.watched
-  FROM show AS s JOIN episode AS e ON s.id = e.show_id ORDER BY s.date_tracked
+  FROM show AS s JOIN episode AS e ON s.id = e.show_id ORDER BY s.date_tracked DESC
   '''
 
   shows = []
@@ -72,10 +72,27 @@ def getShows():
   # split data to get a list for each show
   for k, g in itertools.groupby(data, getShowIdLambda):
     g = list(g)
-    show = Show(g[0],g[1])
+    show = Show(g[0][0], g[0][1])
     episodes = [Episode(e[2],e[3],e[4],e[5],e[6]) for e in g]
     show.addEpisodes(episodes)
     shows.append(show)
 
   return shows
+
+def getShowsLastNextEpisode():
+  query = '''
+  SELECT s.id, s.name, e.id, e.season, e.number, e.name FROM episode AS e JOIN show AS s ON s.id = e.show_id
+  WHERE e.watched = 0 GROUP BY s.id
+  '''
+  
+  query = '''
+  SELECT * FROM (
+	  SELECT * FROM  (
+		  SELECT * FROM episode WHERE episode.watched = 1 ORDER BY episode.id DESC
+	  )
+	  GROUP BY show_id
+  	UNION
+	  SELECT * FROM episode WHERE episode.watched = 0 GROUP BY episode.show_id
+  ) ORDER BY show_id ASC
+'''
 

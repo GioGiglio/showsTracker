@@ -1,0 +1,3 @@
+watch 1 or selected episodes
+remove a show
+update show episodes
