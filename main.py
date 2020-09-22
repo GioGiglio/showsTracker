@@ -17,21 +17,31 @@ def main():
     addShow(args.add)
 
   elif args.watch:
-    watchShow(args.watch)
-  
+    if not args.count:
+      watchShow(args.watch)
+    else:
+      try:
+        count = int(args.count)
+        if count < 1 or count > 10:
+          raise ValueError()
+      except ValueError:
+        print('-- Error: Invalid count')
+        exit(1)
+      else:
+        watchShow(args.watch, count)
+    
   else:
     getShow(args.show)
 
   db.disconnect()
   exit()
 
-# TODO add argument to watch n episodes
 def parseArgs():
   parser = argparse.ArgumentParser(description='Shows progress tracker.')
-  parser.add_argument('-add', action='store', nargs='*')
-  parser.add_argument('-next', action='store', nargs='*')
+  parser.add_argument('-add', '-a', action='store', nargs='*')
   parser.add_argument('show', action='store', nargs='*')
-  parser.add_argument('-watch', action='store', nargs='*')
+  parser.add_argument('-watch', '-w', action='store', nargs='*')
+  parser.add_argument('-count', '-c', action='store')
   return parser.parse_args()
   
 
@@ -72,15 +82,27 @@ def getShow(args):
   #print(show.lastWatchedEpisode())
   #show.printEpisodes()
 
-# args can be:
-# showstracker -watch the office -count 2
-# showstracker -watch the office -e 2 (RECCOMENDED)
-# showstracker -watch the office -n 2
-# showstracker -watch 2 of the office (NOT RECCOMENDED)
-def watchShow(args):
-  print('todo')
+def watchShow(args, count=None):
+  show = db.getShowLike(' '.join(args))
+  if show:
+    episodes = db.getShowEpisodes(show.id)
+    show.addEpisodes(episodes)
+  else:
+    print('-- ERROR: Show is not tracked')
+    return
 
-  # ask for confirm before
+  nextEpIdx = show.getNextEpisodeIdx()
+  if not nextEpIdx:
+    # show finished, no more episodes to watch
+    print('-- Show finished, no more episodes to watch.')
+    return
+  
+  epsIds= util.promptEpisodesToWatch(show, nextEpIdx, count)
+  if epsIds is None:
+    print('-- canceled')
+    return
+  else:
+    db.setEpisodesWatched(epsIds)
 
 if __name__ == '__main__':
   main()

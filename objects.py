@@ -26,14 +26,20 @@ class Show:
       
     return (lastEp, nextEp)
 
+  def getNextEpisodeIdx(self):
+    try:
+      nextEpIdx = next(i for (i,e) in enumerate(self.episodes) if not e.watched)
+    except StopIteration:
+      nextEpIdx = None
+    
+    return nextEpIdx
+    
+
   def printLastNextEpisodes(self):
     lastEp, nextEp = self.getLastNextEpisodes()
     lastEp = 'No episode watched...' if lastEp is None else lastEp
     nextEp = 'No more episodes to watch' if nextEp is None else nextEp
     print('{}:\n{}\n{}\n'.format(bold(self.name), lastEp, nextEp))
-
-  def nextEpisode(self):
-    return next(e for e in self.episodes if not e.watched)
 
   def printEpisodes(self):
     print(*self.episodes, sep='\n') 

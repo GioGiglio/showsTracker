@@ -79,20 +79,9 @@ def getShows():
 
   return shows
 
-def getShowsLastNextEpisode():
-  query = '''
-  SELECT s.id, s.name, e.id, e.season, e.number, e.name FROM episode AS e JOIN show AS s ON s.id = e.show_id
-  WHERE e.watched = 0 GROUP BY s.id
-  '''
-  
-  query = '''
-  SELECT * FROM (
-	  SELECT * FROM  (
-		  SELECT * FROM episode WHERE episode.watched = 1 ORDER BY episode.id DESC
-	  )
-	  GROUP BY show_id
-  	UNION
-	  SELECT * FROM episode WHERE episode.watched = 0 GROUP BY episode.show_id
-  ) ORDER BY show_id ASC
-'''
+def setEpisodesWatched(epsIds):
+  epsIds = [(e,) for e in epsIds]
+  curs = conn.cursor()
+  curs.executemany('UPDATE episode SET watched = 1 WHERE id = ?', (epsIds))
+  conn.commit()
 
