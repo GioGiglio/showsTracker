@@ -9,15 +9,15 @@ import os
 
 def main():
   os.system('clear')
-  db.init()
   args = parseArgs()
-  print(args)
  
   if args.add:
+    db.init()
     addShow(args.add)
 
   elif args.watch:
     if not args.count:
+      db.init()
       watchShow(args.watch)
     else:
       try:
@@ -28,9 +28,11 @@ def main():
         print('-- Error: Invalid count')
         exit(1)
       else:
+        db.init()
         watchShow(args.watch, count)
     
   else:
+    db.init()
     getShow(args.show)
 
   db.disconnect()
@@ -72,7 +74,7 @@ def getShow(args):
 
   show = db.getShowLike(' '.join(args))
   if not show:
-    print('-- ERROR: Show is not tracked')
+    print('-- Error: Show is not tracked')
     return
 
   episodes = db.getShowEpisodes(show.id)
@@ -88,7 +90,7 @@ def watchShow(args, count=None):
     episodes = db.getShowEpisodes(show.id)
     show.addEpisodes(episodes)
   else:
-    print('-- ERROR: Show is not tracked')
+    print('-- Error: Show is not tracked')
     return
 
   nextEpIdx = show.getNextEpisodeIdx()
@@ -99,10 +101,11 @@ def watchShow(args, count=None):
   
   epsIds= util.promptEpisodesToWatch(show, nextEpIdx, count)
   if epsIds is None:
-    print('-- canceled')
+    print('-- Canceled')
     return
   else:
     db.setEpisodesWatched(epsIds)
+    print('-- Episodes marked as watched')
 
 if __name__ == '__main__':
   main()
