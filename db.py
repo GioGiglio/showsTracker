@@ -1,5 +1,3 @@
-from __future__ import annotations
-from typing import Optional, List
 from objects import Show,Episode
 import sqlite3
 import time
@@ -8,7 +6,7 @@ import itertools
 DB_PATH = 'showsTracker.db'
 conn = None
 
-def __connect() -> sqlite3.Connection:
+def __connect():
   return sqlite3.connect(DB_PATH)
 
 def disconnect():
@@ -21,14 +19,14 @@ def init():
   conn = __connect()
 
 
-def checkShowExist(showId: int) -> bool:
+def checkShowExist(showId):
   """Query the database for a show id to check its existence.
   """
   curs = conn.cursor()
   curs.execute('SELECT * FROM show WHERE id=?',(showId,))
   return curs.fetchone() != None
 
-def getShowLike(showName: str) -> Optional[Show]:
+def getShowLike(showName):
   """Query the database for a show name, using LIKE keyword
   and % instead of spaces.
   """
@@ -38,7 +36,7 @@ def getShowLike(showName: str) -> Optional[Show]:
   s = curs.fetchone()
   return Show(s[0], s[1]) if s else None
 
-def saveShow(show: Show):
+def saveShow(show):
   """Inserts a shows and its episodes into the database.
   """
   curs = conn.cursor()
@@ -52,7 +50,7 @@ def saveShow(show: Show):
   curs.executemany('INSERT INTO episode VALUES(?,?,?,?,?,?)', episodes)
   conn.commit()
 
-def getShowEpisodes(showId: int) -> List[Episode]:
+def getShowEpisodes(showId):
   """Query the database for all the episodes of a show.
   """
   curs = conn.cursor()
@@ -68,7 +66,7 @@ def getShowEpisodes(showId: int) -> List[Episode]:
   episodes = [Episode(r[0], r[1], r[2], r[3], r[4]) for r in rows]
   return episodes
 
-def getShows() -> List[Show]:
+def getShows():
   """Query the database for every show and its episodes.
   """
   curs = conn.cursor()
@@ -94,7 +92,7 @@ def getShows() -> List[Show]:
 
   return shows
 
-def setEpisodesWatched(epsIds: List[int]):
+def setEpisodesWatched(epsIds):
   """Update episodes setting to 1 its watched attribute.
   """
   epsIds = [(e,) for e in epsIds]
@@ -102,10 +100,25 @@ def setEpisodesWatched(epsIds: List[int]):
   curs.executemany('UPDATE episode SET watched = 1 WHERE id = ?', (epsIds))
   conn.commit()
 
-def resetShow(showId: int):
+def resetShow(showId):
+  """Update show episodes setting to 0 their watched attribute
+  """
   curs = conn.cursor()
 
   query = 'UPDATE episode SET watched = 0 WHERE show_id = ?'
   curs.execute(query, (showId,) )
+  conn.commit()
+
+def deleteShow(showId):
+  """Removes a show and all its episodes from the database.
+  """
+  curs = conn.cursor()
+
+  queryEpisodes = 'DELETE FROM episode WHERE show_id = ?'
+  queryShow = 'DELETE FROM show WHERE id = ?'
+
+  curs.execute(queryEpisodes, (showId,) )
+  curs.execute(queryShow, (showId,) )
+  
   conn.commit()
 

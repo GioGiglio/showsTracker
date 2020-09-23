@@ -1,38 +1,9 @@
-from __future__ import annotations
-from typing import List
 from objects import *
+from colors import bold, yellow
 import re
 import os
 
-class color:
-  """Utility class that collects the escape sequences
-  for printing colored or styled text.
-  """
-  PURPLE = '\033[95m'
-  CYAN = '\033[96m'
-  DARKCYAN = '\033[36m'
-  BLUE = '\033[94m'
-  GREEN = '\033[92m'
-  YELLOW = '\033[93m'
-  RED = '\033[91m'
-  BOLD = '\033[1m'
-  UNDERLINE = '\033[4m'
-  END = '\033[0m'
-
-
-def bold(s) -> str:
-  """Return s in bold"""
-  return color.BOLD + s + color.END
-
-def red(s) -> str:
-  """Return s in color red"""
-  return color.RED + s + color.END
-
-def yellow(s) -> str:
-  """Return s in color yellow"""
-  return color.YELLOW + s + color.END
-
-def __confirmEpisodesToWatch(show, nextIdx, count, end) -> List[int]:
+def __confirmEpisodesToWatch(show, nextIdx, count, end):
   """Highlight in yellow the episodes to watch
   and prompts the user to confirm the selection
   """
@@ -53,7 +24,7 @@ def __confirmEpisodesToWatch(show, nextIdx, count, end) -> List[int]:
   return epsIds
 
 
-def promptEpisodesToWatch(show, nextIdx, count) -> List[int]:
+def promptEpisodesToWatch(show, nextIdx, count):
   """Print the next 10 (or less) episodes to watch
   and prompt the user to select how many episodes to
   mark as watched.
@@ -91,7 +62,7 @@ def promptEpisodesToWatch(show, nextIdx, count) -> List[int]:
     epsIds = __confirmEpisodesToWatch(show,nextIdx,count,end)
     return epsIds
 
-def promptSelectShow(showsData) -> Show:
+def promptSelectShow(showsData):
   """Parse the json data returned from reqs.searchShow(),
   print name, genre and summary for the first 5 shows and
   prompt the user to select one of them.
@@ -127,12 +98,11 @@ def promptSelectShow(showsData) -> Show:
   name = showsData[selected]['show']['name']
   return Show(id, name)
 
-def promptReset(show: Show) -> bool:
+def confirmReset(show):
   """Ask the user to confirm the reset of watching progress for the show.
   """
   
-  
-  print('Do you really want to RESET the progress for {}? [yes/no]: '.format(bold(show.name)), end='')
+  print('Do you really want to RESET the progress for {}? (Cannot be undone) [yes/no]: '.format(bold(show.name)), end='')
   while True:
     choice = input()
     if choice == 'yes':
@@ -142,3 +112,16 @@ def promptReset(show: Show) -> bool:
     else:
       print('Invalid choice. Please select either yes or no: ', end='')
   
+def confirmDelete(show):
+  """Ask the user to confirm the deletion of a show and its progress.
+  """
+  
+  print('Do you really want to DELETE the show {} and its progress? (Cannot be undone) [yes/no]: '.format(bold(show.name)), end='')
+  while True:
+    choice = input()
+    if choice == 'yes':
+      return True
+    if choice == 'no':
+      return False
+    else:
+      print('Invalid choice. Please select either yes or no: ', end='')

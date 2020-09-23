@@ -1,6 +1,4 @@
-from __future__ import annotations
-from typing import List, Tuple, Optional
-from util import bold,red
+from colors import bold, red
 
 class Show:
   def __init__(self,id, name):
@@ -9,13 +7,13 @@ class Show:
     self.name = name
     self.episodes = []
 
-  def addEpisode(self, e: Episode):
+  def addEpisode(self, e):
     self.episodes.append(e)
   
-  def addEpisodes(self, episodes: List[Episode]):
+  def addEpisodes(self, episodes):
     self.episodes.extend(episodes)
 
-  def getLastNextEpisodes(self) -> Tuple[Optional[Episode], Optional[Episode]]:
+  def getLastNextEpisodes(self):
     try:
       lastEp = next(e for e in reversed(self.episodes) if e.watched)
     except StopIteration:
@@ -28,7 +26,7 @@ class Show:
       
     return (lastEp, nextEp)
 
-  def getNextEpisodeIdx(self) -> Optional[int]:
+  def getNextEpisodeIdx(self):
     try:
       nextEpIdx = next(i for (i,e) in enumerate(self.episodes) if not e.watched)
     except StopIteration:

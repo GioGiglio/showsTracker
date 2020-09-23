@@ -1,9 +1,8 @@
-from __future__ import annotations
 import requests
 
 baseUrl = 'http://api.tvmaze.com'
 
-def searchShow(name: str):
+def searchShow(name):
   subUrl = '/search/shows'
   queryUrl = baseUrl + subUrl + '?q=:' + name
   resp = requests.get(queryUrl)
@@ -13,7 +12,7 @@ def searchShow(name: str):
   return resp.json()
 
 
-def getShowEpisodes(showId: int):
+def getShowEpisodes(showId):
   queryUrl = '{}/shows/{}/episodes'.format(baseUrl, showId)
   resp = requests.get(queryUrl)
   if resp.status_code != 200:
@@ -21,7 +20,7 @@ def getShowEpisodes(showId: int):
 
   return resp.json()
 
-def getShowSeasons(showId: int):
+def getShowSeasons(showId):
   queryUrl = '{}/shows/{}/seasons'.format(baseUrl, showId)
   resp = requests.get(queryUrl)
   if resp.status_code != 200:
@@ -29,7 +28,7 @@ def getShowSeasons(showId: int):
 
   return resp.json()
 
-def getSeasonEpisodes(seasonId: int):
+def getSeasonEpisodes(seasonId):
   queryUrl = '{}/seasons/{}/episodes'.format(baseUrl, seasonId)
   resp = requests.get(queryUrl)
   if resp.status_code != 200:

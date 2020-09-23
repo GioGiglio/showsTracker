@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
 import db
 import reqs
 import util
@@ -118,6 +117,16 @@ def watchShow(args, count=None):
 def deleteShow(args):
   print('delete',args)
 
+  show = db.getShowLike(' '.join(args))
+  if not show:
+    print('-- Error: Show is not tracked')
+    return
+
+  if util.confirmDelete(show):
+    db.deleteShow(show.id)
+    print('-- Show deleted')
+  else:
+    print('-- Canceled')
 
 def resetShow(args):
   print('reset',args)
@@ -127,7 +136,7 @@ def resetShow(args):
     print('-- Error: Show is not tracked')
     return
 
-  if util.promptReset(show):
+  if util.confirmReset(show):
     db.resetShow(show.id)
     print('-- Progress reset')
   else:
