@@ -102,3 +102,10 @@ def setEpisodesWatched(epsIds: List[int]):
   curs.executemany('UPDATE episode SET watched = 1 WHERE id = ?', (epsIds))
   conn.commit()
 
+def resetShow(showId: int):
+  curs = conn.cursor()
+
+  query = 'UPDATE episode SET watched = 0 WHERE show_id = ?'
+  curs.execute(query, (showId,) )
+  conn.commit()
+

@@ -102,7 +102,7 @@ def watchShow(args, count=None):
     return
 
   nextEpIdx = show.getNextEpisodeIdx()
-  if not nextEpIdx:
+  if nextEpIdx is None:
     # show finished, no more episodes to watch
     print('-- Show finished, no more episodes to watch.')
     return
@@ -121,6 +121,18 @@ def deleteShow(args):
 
 def resetShow(args):
   print('reset',args)
+
+  show = db.getShowLike(' '.join(args))
+  if not show:
+    print('-- Error: Show is not tracked')
+    return
+
+  if util.promptReset(show):
+    db.resetShow(show.id)
+    print('-- Progress reset')
+  else:
+    print('-- Canceled')
+
 
 if __name__ == '__main__':
   main()

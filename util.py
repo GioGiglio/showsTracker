@@ -127,3 +127,18 @@ def promptSelectShow(showsData) -> Show:
   name = showsData[selected]['show']['name']
   return Show(id, name)
 
+def promptReset(show: Show) -> bool:
+  """Ask the user to confirm the reset of watching progress for the show.
+  """
+  
+  
+  print('Do you really want to RESET the progress for {}? [yes/no]: '.format(bold(show.name)), end='')
+  while True:
+    choice = input()
+    if choice == 'yes':
+      return True
+    if choice == 'no':
+      return False
+    else:
+      print('Invalid choice. Please select either yes or no: ', end='')
+  
