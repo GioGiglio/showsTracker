@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
 import db
 import reqs
 import util
@@ -30,7 +31,12 @@ def main():
       else:
         db.init()
         watchShow(args.watch, count)
-    
+  elif args.delete:
+    db.init()
+    deleteShow(args.delete)
+  elif args.reset:
+    db.init()
+    resetShow(args.reset)
   else:
     db.init()
     getShow(args.show)
@@ -40,10 +46,12 @@ def main():
 
 def parseArgs():
   parser = argparse.ArgumentParser(description='Shows progress tracker.')
-  parser.add_argument('-add', '-a', action='store', nargs='*')
   parser.add_argument('show', action='store', nargs='*')
+  parser.add_argument('-add',   '-a', action='store', nargs='*')
   parser.add_argument('-watch', '-w', action='store', nargs='*')
   parser.add_argument('-count', '-c', action='store')
+  parser.add_argument('-delete', action='store', nargs='*')
+  parser.add_argument('-reset',  action='store', nargs='*')
   return parser.parse_args()
   
 
@@ -106,6 +114,13 @@ def watchShow(args, count=None):
   else:
     db.setEpisodesWatched(epsIds)
     print('-- Episodes marked as watched')
+
+def deleteShow(args):
+  print('delete',args)
+
+
+def resetShow(args):
+  print('reset',args)
 
 if __name__ == '__main__':
   main()

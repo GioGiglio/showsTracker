@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Tuple, Optional
 from util import bold,red
 
 class Show:
@@ -7,13 +9,13 @@ class Show:
     self.name = name
     self.episodes = []
 
-  def addEpisode(self,e):
+  def addEpisode(self, e: Episode):
     self.episodes.append(e)
   
-  def addEpisodes(self, episodes):
+  def addEpisodes(self, episodes: List[Episode]):
     self.episodes.extend(episodes)
 
-  def getLastNextEpisodes(self):
+  def getLastNextEpisodes(self) -> Tuple[Optional[Episode], Optional[Episode]]:
     try:
       lastEp = next(e for e in reversed(self.episodes) if e.watched)
     except StopIteration:
@@ -26,7 +28,7 @@ class Show:
       
     return (lastEp, nextEp)
 
-  def getNextEpisodeIdx(self):
+  def getNextEpisodeIdx(self) -> Optional[int]:
     try:
       nextEpIdx = next(i for (i,e) in enumerate(self.episodes) if not e.watched)
     except StopIteration:
@@ -45,6 +47,9 @@ class Show:
     print(*self.episodes, sep='\n') 
 
 class Episode:
+  """Describes an episode of a tv show.
+  It is contained into a Show object."""
+
   def __init__(self, id, season, number, name,  watched=False):
     __slots__ = ['id','season','number','name','watched']
     self.id = id
@@ -58,10 +63,4 @@ class Episode:
             bold('<o>') if self.watched else bold(red('<x>')) ,
             self.season, self.number, self.name
     )
-
-#    return 'S{} E{}: {}'.format(
-#            '0' + str(self.season) if self.season < 10 else self.season,
-#            '0' + str(self.number) if self.number < 10 else self.number,
-#            self.name
-#    )
 

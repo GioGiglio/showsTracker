@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List
 from objects import Show,Episode
 import sqlite3
 import time
@@ -6,30 +8,39 @@ import itertools
 DB_PATH = 'showsTracker.db'
 conn = None
 
-def __connect():
+def __connect() -> sqlite3.Connection:
   return sqlite3.connect(DB_PATH)
 
 def disconnect():
   conn.close()
 
 def init():
+  """Initializes the connection to the database.
+  """
   global conn
   conn = __connect()
 
 
-def checkShowExist(showId):
+def checkShowExist(showId: int) -> bool:
+  """Query the database for a show id to check its existence.
+  """
   curs = conn.cursor()
   curs.execute('SELECT * FROM show WHERE id=?',(showId,))
   return curs.fetchone() != None
 
-def getShowLike(showName):
+def getShowLike(showName: str) -> Optional[Show]:
+  """Query the database for a show name, using LIKE keyword
+  and % instead of spaces.
+  """
   curs = conn.cursor()
   showName = showName.replace(' ', '%')
   curs.execute('SELECT id, name FROM show WHERE name LIKE ?', (showName, ))
   s = curs.fetchone()
   return Show(s[0], s[1]) if s else None
 
-def saveShow(show):
+def saveShow(show: Show):
+  """Inserts a shows and its episodes into the database.
+  """
   curs = conn.cursor()
   unixTime = int(time.time())
   
@@ -41,7 +52,9 @@ def saveShow(show):
   curs.executemany('INSERT INTO episode VALUES(?,?,?,?,?,?)', episodes)
   conn.commit()
 
-def getShowEpisodes(showId):
+def getShowEpisodes(showId: int) -> List[Episode]:
+  """Query the database for all the episodes of a show.
+  """
   curs = conn.cursor()
   
   query = '''
@@ -55,7 +68,9 @@ def getShowEpisodes(showId):
   episodes = [Episode(r[0], r[1], r[2], r[3], r[4]) for r in rows]
   return episodes
 
-def getShows():
+def getShows() -> List[Show]:
+  """Query the database for every show and its episodes.
+  """
   curs = conn.cursor()
 
   query = '''
@@ -79,7 +94,9 @@ def getShows():
 
   return shows
 
-def setEpisodesWatched(epsIds):
+def setEpisodesWatched(epsIds: List[int]):
+  """Update episodes setting to 1 its watched attribute.
+  """
   epsIds = [(e,) for e in epsIds]
   curs = conn.cursor()
   curs.executemany('UPDATE episode SET watched = 1 WHERE id = ?', (epsIds))
