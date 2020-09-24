@@ -1,5 +1,5 @@
 from objects import *
-from colors import bold, yellow
+from colors import bold, reverse, yellow
 import re
 import os
 
@@ -59,6 +59,7 @@ def promptEpisodesToWatch(show, nextIdx, count):
         break
     
     os.system('clear')
+    print(reverse(' - WATCH EPISODES: {} - \n'.format(show.name)))
     epsIds = __confirmEpisodesToWatch(show,nextIdx,count,end)
     return epsIds
 
@@ -87,12 +88,15 @@ def promptSelectShow(showsData):
 
   while True:
     try:
-      selected = int(input('Select the show: #'))
+      selected = int(input('Select show: # '))
+      if selected == -1:
+        return None
+
       if selected < 0 or selected >= i:
         raise ValueError()
       break
     except ValueError:
-      print('Invalid selection!')
+      print('-- Invalid selection. [ -1 to cancel the operation ].')
 
   id = showsData[selected]['show']['id']
   name = showsData[selected]['show']['name']

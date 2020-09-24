@@ -31,7 +31,7 @@ def getShowLike(showName):
   and % instead of spaces.
   """
   curs = conn.cursor()
-  showName = showName.replace(' ', '%')
+  showName = showName.replace(' ', '%') + '%'
   curs.execute('SELECT id, name FROM show WHERE name LIKE ?', (showName, ))
   s = curs.fetchone()
   return Show(s[0], s[1]) if s else None

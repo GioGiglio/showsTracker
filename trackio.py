@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from colors import reverse
 import db
 import reqs
 import util
@@ -55,8 +56,14 @@ def parseArgs():
   
 
 def addShow(args):
+  print(reverse(' - ADD SHOW - \n'))
   showsData = reqs.searchShow('-'.join(args))
   show = util.promptSelectShow(showsData)
+  
+  # check if user canceled the action
+  if not show:
+    print('-- Canceled')
+    return
 
   # if show already exist in database, skip
   if db.checkShowExist(show.id):
@@ -73,6 +80,7 @@ def addShow(args):
 def getShow(args):
   if not args:
     # no show specified, print all shows tracked
+    print(reverse(' - TRACKED SHOWS - \n'))
     shows = db.getShows()
     for s in shows:
       s.printLastNextEpisodes()
@@ -84,6 +92,7 @@ def getShow(args):
     print('-- Error: Show is not tracked')
     return
 
+  print(reverse(' - SHOW: {}  - \n'.format(show.name)))
   episodes = db.getShowEpisodes(show.id)
   show.addEpisodes(episodes)
   show.printLastNextEpisodes()
@@ -100,6 +109,7 @@ def watchShow(args, count=None):
     print('-- Error: Show is not tracked')
     return
 
+  print(reverse(' - WATCH EPISODES: {} - \n'.format(show.name)))
   nextEpIdx = show.getNextEpisodeIdx()
   if nextEpIdx is None:
     # show finished, no more episodes to watch
@@ -115,13 +125,13 @@ def watchShow(args, count=None):
     print('-- Episodes marked as watched')
 
 def deleteShow(args):
-  print('delete',args)
 
   show = db.getShowLike(' '.join(args))
   if not show:
     print('-- Error: Show is not tracked')
     return
 
+  print(reverse(' - DELETE SHOW: {} - \n'.format(show.name)))
   if util.confirmDelete(show):
     db.deleteShow(show.id)
     print('-- Show deleted')
@@ -129,13 +139,13 @@ def deleteShow(args):
     print('-- Canceled')
 
 def resetShow(args):
-  print('reset',args)
 
   show = db.getShowLike(' '.join(args))
   if not show:
     print('-- Error: Show is not tracked')
     return
 
+  print(reverse(' - RESET SHOW PROGRESS: {} - \n'.format(show.name)))
   if util.confirmReset(show):
     db.resetShow(show.id)
     print('-- Progress reset')

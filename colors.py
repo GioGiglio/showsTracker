@@ -7,6 +7,7 @@ YELLOW = '\033[93m'
 RED = '\033[91m'
 BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
+REVERSE = '\033[;7m'
 END = '\033[0m'
 
 def bold(s):
@@ -21,3 +22,6 @@ def yellow(s):
   """Return s in color yellow"""
   return YELLOW + s + END
 
+def reverse(s):
+  """Return s in reverse style"""
+  return REVERSE + s + END
