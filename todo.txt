@@ -1,3 +1,4 @@
-watch 1 or selected episodes
-remove a show
-update show episodes
++ watch 1 or selected episodes
++ remove a show
+- update show episodes
+- sort shows based on last episode watched

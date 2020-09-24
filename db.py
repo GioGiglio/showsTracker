@@ -92,12 +92,16 @@ def getShows():
 
   return shows
 
-def setEpisodesWatched(epsIds):
+def setEpisodesWatched(epsIds, showId):
   """Update episodes setting to 1 its watched attribute.
+  Update also the show date_tracked attribute.
   """
   epsIds = [(e,) for e in epsIds]
   curs = conn.cursor()
   curs.executemany('UPDATE episode SET watched = 1 WHERE id = ?', (epsIds))
+
+  unixTime = int(time.time())
+  curs.execute('UPDATE show SET date_tracked = ? WHERE id = ?', (unixTime, showId))
   conn.commit()
 
 def resetShow(showId):

@@ -111,7 +111,7 @@ def watchShow(args, count=None):
     print('-- Canceled')
     return
   else:
-    db.setEpisodesWatched(epsIds)
+    db.setEpisodesWatched(epsIds, show.id)
     print('-- Episodes marked as watched')
 
 def deleteShow(args):
