@@ -58,6 +58,7 @@ def getShowEpisodes(showId):
   query = '''
   SELECT e.id, e.season, e.number, e.name, e.watched
   FROM episode AS e JOIN show ON show.id = e.show_id WHERE e.show_id = ?
+  ORDER BY season, number
   '''
 
   curs.execute(query, (showId,) )
