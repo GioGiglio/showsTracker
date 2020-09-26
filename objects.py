@@ -42,7 +42,15 @@ class Show:
     print('{}:\n{}\n{}\n'.format(bold(self.name), lastEp, nextEp))
 
   def printEpisodes(self):
-    print(*self.episodes, sep='\n') 
+    if not self.episodes:
+      return
+
+    lastSeason = self.episodes[0].season
+    for e in self.episodes:
+      if e.season != lastSeason:
+        lastSeason = e.season
+        print()
+      print(e)
 
 class Episode:
   """Describes an episode of a tv show.

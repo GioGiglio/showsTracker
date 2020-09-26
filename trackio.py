@@ -31,6 +31,9 @@ def main():
       else:
         db.init()
         watchShow(args.watch, count)
+  elif args.episodes:
+    db.init()
+    showEpisodes(args.episodes)
   elif args.delete:
     db.init()
     deleteShow(args.delete)
@@ -49,6 +52,7 @@ def parseArgs():
   parser.add_argument('show', action='store', nargs='*')
   parser.add_argument('-add',   '-a', action='store', nargs='*')
   parser.add_argument('-watch', '-w', action='store', nargs='*')
+  parser.add_argument('-episodes', '-e', action='store', nargs='*')
   parser.add_argument('-count', '-c', action='store')
   parser.add_argument('-delete', action='store', nargs='*')
   parser.add_argument('-reset',  action='store', nargs='*')
@@ -96,9 +100,6 @@ def getShow(args):
   episodes = db.getShowEpisodes(show.id)
   show.addEpisodes(episodes)
   show.printLastNextEpisodes()
-  
-  #print(show.lastWatchedEpisode())
-  #show.printEpisodes()
 
 def watchShow(args, count=None):
   show = db.getShowLike(' '.join(args))
@@ -124,8 +125,20 @@ def watchShow(args, count=None):
     db.setEpisodesWatched(epsIds, show.id)
     print('-- Episodes marked as watched')
 
-def deleteShow(args):
+def showEpisodes(args):
+  show = db.getShowLike(' '.join(args))
+  if not show:
+    print('-- Error: Show is not tracked')
+    return
 
+  # get show episodes
+  episodes = db.getShowEpisodes(show.id)
+  show.addEpisodes(episodes)
+
+  print(reverse(' SHOW EPISODES: {} - \n'.format(show.name)))
+  show.printEpisodes()
+
+def deleteShow(args):
   show = db.getShowLike(' '.join(args))
   if not show:
     print('-- Error: Show is not tracked')
