@@ -3,7 +3,7 @@ import sqlite3
 import time
 import itertools
 
-DB_PATH = 'showsTracker.db'
+DB_PATH = '/home/gio/.personal/trackio/trackio.db'
 conn = None
 
 def __connect():
