@@ -1,4 +1,4 @@
-from colors import bold, red
+from colors import bold, red, blue
 
 class Show:
   def __init__(self,id, name):
@@ -39,7 +39,11 @@ class Show:
     lastEp, nextEp = self.getLastNextEpisodes()
     lastEp = 'No episode watched...' if lastEp is None else lastEp
     nextEp = 'No more episodes to watch' if nextEp is None else nextEp
-    print('{}:\n{}\n{}\n'.format(bold(self.name), lastEp, nextEp))
+    watched = sum(e.watched for e in self.episodes)
+    toWatch = len(self.episodes) - watched
+    countInfo = bold(blue(str(watched))) + ' | ' + bold(blue(str(toWatch)))
+    #countInfo = blue('<o> ' + str(watched)) + ' | ' + blue('<x> ' + str(toWatch))
+    print('{}: {}\n{}\n{}\n'.format(bold(self.name), countInfo, lastEp, nextEp))
 
   def printEpisodes(self):
     if not self.episodes:
@@ -65,7 +69,7 @@ class Episode:
     self.watched = watched
 
   def __str__(self):
-    return '{} S{} E{}: {}'.format(
+    return '{} S{} E{:<2}: {}'.format(
             bold('<o>') if self.watched else bold(red('<x>')) ,
             self.season, self.number, self.name
     )
