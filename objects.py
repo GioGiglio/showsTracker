@@ -38,10 +38,11 @@ class Show:
   def printLastNextEpisodes(self):
     lastEp, nextEp = self.getLastNextEpisodes()
     lastEp = 'No episode watched...' if lastEp is None else lastEp
-    nextEp = 'No more episodes to watch' if nextEp is None else nextEp
+    nextEp = 'No more episodes to watch...' if nextEp is None else nextEp
     watched = sum(e.watched for e in self.episodes)
     toWatch = len(self.episodes) - watched
-    countInfo = bold(blue(str(watched))) + ' | ' + bold(blue(str(toWatch)))
+    progressPercentage = int((watched / len(self.episodes)) * 100)
+    countInfo = bold(blue(str(progressPercentage) + '%')) + ' (' + bold(blue(str(watched))) + ' | ' + bold(blue(str(toWatch))) + ')'
     #countInfo = blue('<o> ' + str(watched)) + ' | ' + blue('<x> ' + str(toWatch))
     print('{}: {}\n{}\n{}\n'.format(bold(self.name), countInfo, lastEp, nextEp))
 

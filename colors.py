@@ -25,3 +25,7 @@ def yellow(s):
 def reverse(s):
   """Return s in reverse style"""
   return REVERSE + s + END
+
+def blue(s):
+  """Return s in color yellow"""
+  return BLUE + s + END

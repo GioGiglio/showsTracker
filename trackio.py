@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from colors import reverse
+from colors import reverse, blue
 import db
 import reqs
 import util
@@ -42,20 +42,37 @@ def main():
     resetShow(args.reset)
   else:
     db.init()
-    getShow(args.show)
+    getShow(args.show, args.all)
 
   db.disconnect()
   exit()
 
 def parseArgs():
   parser = argparse.ArgumentParser(description='Shows progress tracker.')
+  # if no flag is provided, args are stored in the "show" argument.
   parser.add_argument('show', action='store', nargs='*')
+  
+  # arg used to track a new tv show
   parser.add_argument('-add',   '-a', action='store', nargs='*')
+
+  # arg used to watch some episodes of the selected tv show
   parser.add_argument('-watch', '-w', action='store', nargs='*')
-  parser.add_argument('-episodes', '-e', action='store', nargs='*')
+
+  # arg used with the "-watch" arg, to select how many episodes to watch
   parser.add_argument('-count', '-c', action='store')
+  
+  # arg used to print all episodes of the selected tv show
+  parser.add_argument('-episodes', '-e', action='store', nargs='*')
+  
+  # arg used to delete the selected tv show
   parser.add_argument('-delete', action='store', nargs='*')
+
+  # arg used to reset the tracking progress for the selected show
   parser.add_argument('-reset',  action='store', nargs='*')
+
+  # arg used alone, to show ALSO the not started and finished shows
+  parser.add_argument('-all', action='store_true')
+
   return parser.parse_args()
   
 
@@ -81,17 +98,31 @@ def addShow(args):
   db.saveShow(show)
   print('-- Show saved')
 
-def getShow(args):
-  if not args:
+def getShow(name, all):
+  if not name:
     # no show specified, print all shows tracked
-    print(reverse(' - TRACKED SHOWS - \n'))
     shows = db.getShows()
+
+    if not all:
+      # count not started shows and finished shows
+      notStarted = sum(not s.episodes[0].watched for s in shows)
+      finished = sum(s.episodes[-1].watched for s in shows)
+
+      # print top message
+      print(reverse(' - TRACKED SHOWS - '))
+      print(blue('{} to start, {} finished \n'.format(notStarted, finished)))
+      # filter only shows started and not finished
+      shows = [ s for s in shows if s.episodes[0].watched and not s.episodes[-1].watched ]
+    else:
+      # print top message
+      print(reverse(' - TRACKED SHOWS - \n'))
+
     for s in shows:
       s.printLastNextEpisodes()
     
     return
 
-  show = db.getShowLike(' '.join(args))
+  show = db.getShowLike(' '.join(name))
   if not show:
     print('-- Error: Show is not tracked')
     return

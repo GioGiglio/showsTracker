@@ -14,7 +14,7 @@ def __confirmEpisodesToWatch(show, nextIdx, count, end):
   
   print()
   while True:
-    choice = input('Confirm {} episodes watched? [y/n]: '.format(count))
+    choice = input('Confirm {} episodes watched? [Y/n]: '.format(count))
     if choice in ['','y','yes']:
       break
     if choice in ['n','no']:
@@ -106,26 +106,26 @@ def confirmReset(show):
   """Ask the user to confirm the reset of watching progress for the show.
   """
   
-  print('Do you really want to RESET the progress for {}? (Cannot be undone) [yes/no]: '.format(bold(show.name)), end='')
+  print('Do you really want to RESET the progress for {}? (Cannot be undone) [yes/NO]: '.format(bold(show.name)), end='')
   while True:
     choice = input()
     if choice == 'yes':
       return True
-    if choice == 'no':
+    if choice in ['','no'] :
       return False
     else:
-      print('Invalid choice. Please select either yes or no: ', end='')
+      print('Invalid choice. [yes/NO]: ', end='')
   
 def confirmDelete(show):
   """Ask the user to confirm the deletion of a show and its progress.
   """
   
-  print('Do you really want to DELETE the show {} and its progress? (Cannot be undone) [yes/no]: '.format(bold(show.name)), end='')
+  print('Do you really want to DELETE the show {} and its progress? (Cannot be undone) [yes/NO]: '.format(bold(show.name)), end='')
   while True:
     choice = input()
     if choice == 'yes':
       return True
-    if choice == 'no':
+    if choice in ['','no'] :
       return False
     else:
-      print('Invalid choice. Please select either yes or no: ', end='')
+      print('Invalid choice. [yes/NO]: ', end='')
