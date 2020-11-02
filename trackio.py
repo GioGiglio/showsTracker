@@ -7,11 +7,15 @@ import util
 from objects import *
 import argparse
 import os
+import re
+import prefs as prefs_mod
+
 
 def main():
-  os.system('clear')
+  prefs = prefs_mod.load()
   args = parseArgs()
- 
+  os.system('clear')
+
   if args.add:
     db.init()
     addShow(args.add)
@@ -33,7 +37,7 @@ def main():
         watchShow(args.watch, count)
   elif args.episodes:
     db.init()
-    showEpisodes(args.episodes)
+    showEpisodes(args.episodes, prefs['eps_list_summary'])
   elif args.delete:
     db.init()
     deleteShow(args.delete)
@@ -42,7 +46,7 @@ def main():
     resetShow(args.reset)
   else:
     db.init()
-    getShow(args.show, args.all)
+    getShow(args.show, prefs['view'], prefs['curr_next_summary'])
 
   db.disconnect()
   exit()
@@ -70,9 +74,6 @@ def parseArgs():
   # arg used to reset the tracking progress for the selected show
   parser.add_argument('-reset',  action='store', nargs='*')
 
-  # arg used alone, to show ALSO the not started and finished shows
-  parser.add_argument('-all', action='store_true')
-
   return parser.parse_args()
   
 
@@ -90,20 +91,32 @@ def addShow(args):
   if db.checkShowExist(show.id):
     print('-- Show already tracked')
     return
+
+  # regex to match html tags
+  htmlTagsRe = re.compile('<.*?>')
   
   episodes = reqs.getShowEpisodes(show.id)
-  episodes = [ Episode(e['id'], e['season'], e['number'], e['name']) for e in episodes]
+
+  episodes = [ Episode(
+                       e['id'],
+                       e['season'],
+                       e['number'],
+                       e['name'],
+                       False,       # watched
+                       re.sub(htmlTagsRe,'',e['summary']) if e['summary'] else None
+                       )
+  for e in episodes]
   show.addEpisodes(episodes)
   
   db.saveShow(show)
   print('-- Show saved')
 
-def getShow(name, all):
+def getShow(name, view, currNextSummary):
   if not name:
     # no show specified, print all shows tracked
     shows = db.getShows()
 
-    if not all:
+    if view == 'watching':
       # count not started shows and finished shows
       notStarted = sum(not s.episodes[0].watched for s in shows)
       finished = sum(s.episodes[-1].watched for s in shows)
@@ -114,11 +127,12 @@ def getShow(name, all):
       # filter only shows started and not finished
       shows = [ s for s in shows if s.episodes[0].watched and not s.episodes[-1].watched ]
     else:
+      # view == 'all'
       # print top message
       print(reverse(' - TRACKED SHOWS - \n'))
 
     for s in shows:
-      s.printLastNextEpisodes()
+      s.printLastNextEpisodes(currNextSummary)
     
     return
 
@@ -156,7 +170,7 @@ def watchShow(args, count=None):
     db.setEpisodesWatched(epsIds, show.id)
     print('-- Episodes marked as watched')
 
-def showEpisodes(args):
+def showEpisodes(args, prefSummary):
   show = db.getShowLike(' '.join(args))
   if not show:
     print('-- Error: Show is not tracked')
@@ -166,8 +180,8 @@ def showEpisodes(args):
   episodes = db.getShowEpisodes(show.id)
   show.addEpisodes(episodes)
 
-  print(reverse(' SHOW EPISODES: {} - \n'.format(show.name)))
-  show.printEpisodes()
+  print(reverse(' - SHOW EPISODES: {} - \n'.format(show.name)))
+  show.printEpisodes(prefSummary)
 
 def deleteShow(args):
   show = db.getShowLike(' '.join(args))

@@ -1,4 +1,9 @@
 + watch 1 or selected episodes
 + remove a show
++ sort shows based on last episode watched
++ pref: no-spoiler mode. summary does not appear for episodes not watched yet
++ pref: do not show summary
+- setup: initialize db
 - update show episodes
-- sort shows based on last episode watched
+- option to sort shows by progress
+- do not request summary if its disabled by default
