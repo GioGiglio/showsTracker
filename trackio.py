@@ -9,6 +9,7 @@ import argparse
 import os
 import re
 import prefs as prefs_mod
+import test
 
 
 def main():
@@ -37,7 +38,7 @@ def main():
         watchShow(args.watch, count)
   elif args.episodes:
     db.init()
-    showEpisodes(args.episodes, prefs['eps_list_summary'])
+    showEpisodes(args.episodes, prefs.epsListSummary)
   elif args.delete:
     db.init()
     deleteShow(args.delete)
@@ -46,7 +47,7 @@ def main():
     resetShow(args.reset)
   else:
     db.init()
-    getShow(args.show, prefs['view'], prefs['curr_next_summary'])
+    getShow(args.show, prefs.view, prefs.overviewSummary)
 
   db.disconnect()
   exit()
@@ -111,12 +112,12 @@ def addShow(args):
   db.saveShow(show)
   print('-- Show saved')
 
-def getShow(name, view, currNextSummary):
+def getShow(name, view, overviewSummary):
   if not name:
     # no show specified, print all shows tracked
     shows = db.getShows()
 
-    if view == 'watching':
+    if view.watching:
       # count not started shows and finished shows
       notStarted = sum(not s.episodes[0].watched for s in shows)
       finished = sum(s.episodes[-1].watched for s in shows)
@@ -127,12 +128,14 @@ def getShow(name, view, currNextSummary):
       # filter only shows started and not finished
       shows = [ s for s in shows if s.episodes[0].watched and not s.episodes[-1].watched ]
     else:
-      # view == 'all'
       # print top message
       print(reverse(' - TRACKED SHOWS - \n'))
 
     for s in shows:
-      s.printLastNextEpisodes(currNextSummary)
+      s.printCurrNextEpisodes(overviewSummary)
+
+    # test.save(shows)
+    # test.read()
     
     return
 
@@ -144,7 +147,7 @@ def getShow(name, view, currNextSummary):
   print(reverse(' - SHOW: {}  - \n'.format(show.name)))
   episodes = db.getShowEpisodes(show.id)
   show.addEpisodes(episodes)
-  show.printLastNextEpisodes()
+  show.printCurrNextEpisodes()
 
 def watchShow(args, count=None):
   show = db.getShowLike(' '.join(args))

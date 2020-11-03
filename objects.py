@@ -39,7 +39,9 @@ class Show:
     return nextEpIdx
     
 
-  def printLastNextEpisodes(self, prefCurrNextSummary):
+  def printCurrNextEpisodes(self, prefs):
+    '''prefs is the namedtuple OverviewSummary(on, off, onlyWatched)
+    '''
     currEp, nextEp = self.getCurrNextEpisodes()
     watched = sum(e.watched for e in self.episodes)
     toWatch = len(self.episodes) - watched
@@ -47,26 +49,32 @@ class Show:
     countInfo = bold(blue(str(progressPercentage) + '%')) + ' (' + bold(blue(str(watched))) + ' | ' + bold(blue(str(toWatch))) + ')'
     # print('{}: {}\n{}\n{}\n'.format(bold(self.name), countInfo, lastEp, nextEp))
     print('{}: {}'.format(bold(self.name), countInfo))
+
     if currEp:
-      currEp.print(prefCurrNextSummary)
+      withSummary = not prefs.off
+      currEp.printWithSummary(withSummary)
     else:
       print('No episode watched...')
 
     if nextEp:
-      nextEp.print(prefCurrNextSummary)
+      withSummary = prefs.on
+      nextEp.printWithSummary(withSummary)
     else:
       print('No more episodes to watch...')
 
     print()
 
-  def printEpisodes(self, prefSummary):
+  def printEpisodes(self, prefs):
+    '''prefs is the namedtuple EpsListSummary(on, off, onlyWatched)
+    '''
     if not self.episodes:
       return
 
     lastSeason = self.episodes[0].season
     for e in self.episodes:
       if e.season == lastSeason:
-        e.print(prefSummary)
+        withSummary = prefs.on or (prefs.onlyWatched and e.watched)
+        e.printWithSummary(withSummary)
       else:
         # episode from another season
         lastSeason = e.season
@@ -92,23 +100,12 @@ class Episode:
             self.season, self.number, self.name, gray(italic(self.summary[:space])) if self.summary else ''
     )
 
-  def print(self, prefSummary):
-    space = term_width - 20 - len(self.name)
-
-    ep = '{} S{} E{:<2}: {}'.format(
-      bold('<o>') if self.watched else bold(red('<x>')) ,
-      self.season, self.number, self.name)
-
-    if prefSummary == 'off':
-      print(ep)
-    elif prefSummary == 'on':
+  def printWithSummary(self, withSummary=True):
+    eye = bold('<o>') if self.watched else bold(red('<x>'))
+    if withSummary:
+      space = term_width - 20 - len(self.name)
       summ = gray(italic(self.summary[:space])) if self.summary else ''
-      print(ep, summ)
-    elif prefSummary == 'only_watched':
-      if not self.watched:
-        print(ep)
-      else:
-        summ = gray(italic(self.summary[:space])) if self.summary else ''
-        print(ep, summ)
-
-
+      print('{} S{} E{:<2}: {} {}'.format(eye, self.season, self.number, self.name, summ))
+    else:
+      print('{} S{} E{:<2}: {}'.format(eye, self.season, self.number, self.name))
+ 
