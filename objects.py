@@ -47,7 +47,6 @@ class Show:
     toWatch = len(self.episodes) - watched
     progressPercentage = int((watched / len(self.episodes)) * 100)
     countInfo = bold(blue(str(progressPercentage) + '%')) + ' (' + bold(blue(str(watched))) + ' | ' + bold(blue(str(toWatch))) + ')'
-    # print('{}: {}\n{}\n{}\n'.format(bold(self.name), countInfo, lastEp, nextEp))
     print('{}: {}'.format(bold(self.name), countInfo))
 
     if currEp:

@@ -45,6 +45,9 @@ def main():
   elif args.reset:
     db.init()
     resetShow(args.reset)
+  elif args.help:
+    printHelp()
+    return
   else:
     db.init()
     getShow(args.show, prefs.view, prefs.overviewSummary)
@@ -53,31 +56,53 @@ def main():
   exit()
 
 def parseArgs():
-  parser = argparse.ArgumentParser(description='Shows progress tracker.')
+  parser = argparse.ArgumentParser(description='Shows progress tracker.', add_help=False)
   # if no flag is provided, args are stored in the "show" argument.
   parser.add_argument('show', action='store', nargs='*')
   
   # arg used to track a new tv show
-  parser.add_argument('-add',   '-a', action='store', nargs='*')
+  parser.add_argument('-add',   '-a', action='store', nargs='*', help='track a new show')
 
   # arg used to watch some episodes of the selected tv show
-  parser.add_argument('-watch', '-w', action='store', nargs='*')
+  parser.add_argument('-watch', '-w', action='store', nargs='*', help='watch episodes of a show')
 
-  # arg used with the "-watch" arg, to select how many episodes to watch
-  parser.add_argument('-count', '-c', action='store')
+  # arg used with the "-watch" arg, to specify how many episodes to watch
+  parser.add_argument('-count', '-c', action='store', help='used with -watch, specify the number of episodes watched (max 10)')
   
   # arg used to print all episodes of the selected tv show
-  parser.add_argument('-episodes', '-e', action='store', nargs='*')
+  parser.add_argument('-episodes', '-e', action='store', nargs='*', help='print all the episodes of a show')
   
   # arg used to delete the selected tv show
-  parser.add_argument('-delete', action='store', nargs='*')
+  parser.add_argument('-delete', action='store', nargs='*', help='delete a show')
 
   # arg used to reset the tracking progress for the selected show
-  parser.add_argument('-reset',  action='store', nargs='*')
+  parser.add_argument('-reset',  action='store', nargs='*', help='reset the progress for a show')
+
+  # arg used to print and help message and exit
+  parser.add_argument('-h', '-help', '--help',  action='store_true', help='print this help message and exit')
 
   return parser.parse_args()
-  
 
+
+def printHelp():
+  # https://stackoverflow.com/questions/9725675/is-there-a-standard-format-for-command-line-shell-help-text
+  print('''
+Usage: trackio [OPTION]
+Tv shows tracking utility
+
+  -a, -add      show  track a new show
+  -w, -watch    show  mark a show's episodes as watched
+  -c, -count    1-10  with -w, watch a specific number of episodes
+  -e, -episodes show  print all episodes of a show
+  -d, -delete   show  delete a show
+  -r, -reset    show  reset the progress for a show
+  -h, -help           print this help message and exit
+
+Examples:
+  trackio -w the office -c 3  Mark the next three episodes of the office as watched
+  trackio -reset the office   Mark all the episodes of the office as unwatched (reset progress).
+  ''')
+  
 def addShow(args):
   print(reverse(' - ADD SHOW - \n'))
   showsData = reqs.searchShow('-'.join(args))
@@ -117,6 +142,12 @@ def getShow(name, view, overviewSummary):
     # no show specified, print all shows tracked
     shows = db.getShows()
 
+    # different message when no shows are tracked
+    if len(shows) == 0:
+      print(reverse(' - NO SHOW TRACKED - '))
+      print('\n-- info: use option --help to print available commands')
+      return
+
     if view.watching:
       # count not started shows and finished shows
       notStarted = sum(not s.episodes[0].watched for s in shows)
@@ -134,9 +165,6 @@ def getShow(name, view, overviewSummary):
     for s in shows:
       s.printCurrNextEpisodes(overviewSummary)
 
-    # test.save(shows)
-    # test.read()
-    
     return
 
   show = db.getShowLike(' '.join(name))

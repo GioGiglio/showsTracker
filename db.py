@@ -1,10 +1,46 @@
 from objects import Show,Episode
+from pathlib import Path
 import sqlite3
 import time
 import itertools
 
-DB_PATH = '/home/gio/.personal/trackio/trackio.db'
+DB_PATH = '/home/gio/.personal/trackio/trackio2.db'
 conn = None
+
+def __initDBAndConnect():
+  """Connects to the file previously created and executes sql to
+  create the tables needed. It leaves the connection to the DB open.
+  """
+  global conn
+
+  createShowTable = '''
+  CREATE TABLE IF NOT EXISTS show (
+	  id	INTEGER NOT NULL,
+	  name	TEXT NOT NULL,
+	  date_tracked	INTEGER NOT NULL,
+    PRIMARY KEY(id)
+  )
+  '''
+
+  createEpisodeTable  = '''
+  CREATE TABLE IF NOT EXISTS episode (
+  	id	INTEGER NOT NULL,
+  	show_id	INTEGER NOT NULL,
+  	season	INTEGER NOT NULL,
+  	number	INTEGER NOT NULL,
+  	name	TEXT NOT NULL,
+  	watched	INTEGER NOT NULL,
+  	summary	TEXT,
+  	PRIMARY KEY(id)
+  )
+  '''
+ 
+  conn = __connect()
+  curs = conn.cursor()
+
+  curs.execute(createShowTable)
+  curs.execute(createEpisodeTable)
+  conn.commit()
 
 def __connect():
   return sqlite3.connect(DB_PATH)
@@ -13,10 +49,20 @@ def disconnect():
   conn.close()
 
 def init():
-  """Initializes the connection to the database.
+  """Initializes the connection to the database,
+  creating and initializing it if it does not exist yet.
   """
-  global conn
-  conn = __connect()
+
+  # if the DB file doesn't exists, create the db
+  dbFilePath = Path(DB_PATH)
+  if not dbFilePath.exists():
+    # create .db file first, then connect and create tables
+    print('-- info: database file does not exist yet. Creating and initializing it...')
+    dbFilePath.touch()
+    __initDBAndConnect()
+  else:
+    global conn
+    conn = __connect()
 
 
 def checkShowExist(showId):

@@ -3,7 +3,9 @@
 + sort shows based on last episode watched
 + pref: no-spoiler mode. summary does not appear for episodes not watched yet
 + pref: do not show summary
-- setup: initialize db
++ setup: initialize db
++ different message when no shows are tracked
++ help message
 - update show episodes
 - option to sort shows by progress
 - do not request summary if its disabled by default
