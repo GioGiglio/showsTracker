@@ -175,7 +175,7 @@ def getShow(name, view, overviewSummary):
   print(reverse(' - SHOW: {}  - \n'.format(show.name)))
   episodes = db.getShowEpisodes(show.id)
   show.addEpisodes(episodes)
-  show.printCurrNextEpisodes()
+  show.printCurrNextEpisodes(overviewSummary)
 
 def watchShow(args, count=None):
   show = db.getShowLike(' '.join(args))

@@ -1,5 +1,5 @@
 {
     "view": "watching",
     "shows_overview_summary": "only_watched",
-    "episodes_list_summary" : "only_watched"
+    "episodes_list_summary" : "on"
 }

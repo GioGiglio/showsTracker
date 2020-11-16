@@ -69,15 +69,16 @@ class Show:
     if not self.episodes:
       return
 
-    lastSeason = self.episodes[0].season
+    currSeason = self.episodes[0].season
     for e in self.episodes:
-      if e.season == lastSeason:
+      if e.season != currSeason:
+        # episode from another season
+        currSeason = e.season
+        print()
+
+      if e.season == currSeason:
         withSummary = prefs.on or (prefs.onlyWatched and e.watched)
         e.printWithSummary(withSummary)
-      else:
-        # episode from another season
-        lastSeason = e.season
-        print()
 
 class Episode:
   """Describes an episode of a tv show.

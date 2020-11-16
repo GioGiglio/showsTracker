@@ -4,14 +4,12 @@ import sqlite3
 import time
 import itertools
 
-DB_PATH = '/home/gio/.personal/trackio/trackio2.db'
+DB_PATH = '/home/gio/.personal/trackio/trackio.db'
 conn = None
 
-def __initDBAndConnect():
-  """Connects to the file previously created and executes sql to
-  create the tables needed. It leaves the connection to the DB open.
+def __initDB():
+  """Executes sql to create the tables needed.
   """
-  global conn
 
   createShowTable = '''
   CREATE TABLE IF NOT EXISTS show (
@@ -35,7 +33,6 @@ def __initDBAndConnect():
   )
   '''
  
-  conn = __connect()
   curs = conn.cursor()
 
   curs.execute(createShowTable)
@@ -52,16 +49,18 @@ def init():
   """Initializes the connection to the database,
   creating and initializing it if it does not exist yet.
   """
-
+  
+  global conn
+  
   # if the DB file doesn't exists, create the db
   dbFilePath = Path(DB_PATH)
   if not dbFilePath.exists():
     # create .db file first, then connect and create tables
-    print('-- info: database file does not exist yet. Creating and initializing it...')
+    print('-- info: database does not exist yet. Creating and initializing it...')
     dbFilePath.touch()
-    __initDBAndConnect()
+    conn = __connect()
+    __initDB()
   else:
-    global conn
     conn = __connect()
 
 
