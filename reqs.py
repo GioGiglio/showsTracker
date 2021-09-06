@@ -4,7 +4,7 @@ baseUrl = 'http://api.tvmaze.com'
 
 def searchShow(name):
   subUrl = '/search/shows'
-  queryUrl = baseUrl + subUrl + '?q=:' + name
+  queryUrl = baseUrl + subUrl + '?q=' + name
   resp = requests.get(queryUrl)
   if resp.status_code != 200:
     raise Exception('Request error')

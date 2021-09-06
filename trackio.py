@@ -105,7 +105,7 @@ Examples:
   
 def addShow(args):
   print(reverse(' - ADD SHOW - \n'))
-  showsData = reqs.searchShow('-'.join(args))
+  showsData = reqs.searchShow('%20'.join(args))
   show = util.promptSelectShow(showsData)
   
   # check if user canceled the action
